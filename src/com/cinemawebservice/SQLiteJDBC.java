@@ -1,6 +1,8 @@
 	package com.cinemawebservice;
 
+
 import java.sql.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +26,7 @@ public class SQLiteJDBC
     Connection c = null;
     try {
       Class.forName("org.sqlite.JDBC");
-      c = DriverManager.getConnection("jdbc:sqlite:cinemafinal1.db");
+      c = DriverManager.getConnection("jdbc:sqlite:cinemafinal60.db");
       
       
     } catch ( Exception e ) {
@@ -117,11 +119,17 @@ public class SQLiteJDBC
 		try 
 		{
 	 
-			input = new FileInputStream("/Users/ushaikh/Documents/uzmawork/CinemaWeb/appProperties.properties");
+			input = new FileInputStream("appProperties.properties");
 			// load a properties file
 			prop.load(input);
 			// get the property value and print it out
 			String fileName = prop.getProperty("cinemaRootDirectory");
+		/*	String fileName = new String("http://"+"localhost:8080/CinemaWeb/info.json");
+			System.out.println(fileName);
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			URL url = classLoader.getResource("http://"+"localhost:8080/CinemaWeb/info.json");*/
+		
+			
 			JSONParser parser = new JSONParser();
 		   try 
 		   {
@@ -210,7 +218,7 @@ public class SQLiteJDBC
 	  try 
 	  {
 	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:cinemafinal1.db");
+	      c = DriverManager.getConnection("jdbc:sqlite:cinemafinal60.db");
 	     
 	      hierarchy = getHierarchy(c);
 	      
@@ -268,8 +276,8 @@ public class SQLiteJDBC
   
   public static void main(String args[])
   {
-	 searchCinema("time between 1 AND 5");
-	 
+	 parseJSON();
+	
   }
   
  
@@ -279,8 +287,8 @@ public class SQLiteJDBC
 
 	  Statement stmt = null;
 	  ArrayList<String> queryValues=new ArrayList<String>();
-	  int argument_id=0;
-	  int arg_value = 0;
+	  int argument_id=999;
+	  int arg_value = 999;
 	  try 
 	    {
 		      stmt = c.createStatement();
@@ -290,17 +298,21 @@ public class SQLiteJDBC
 		         argument_id = rs.getInt("argument_id");
 		      }
 		      stmt = c.createStatement();
-		      rs = stmt.executeQuery( "SELECT ARGUMENT_VAL FROM ARGUMENT_VALUE WHERE ARGUMENT_ID ="+ argument_id+" AND ARGUMENT_VAL "+queryString);
+		      String sql=new String("SELECT ARGUMENT_VAL FROM ARGUMENT_VALUE WHERE ARGUMENT_ID ="+ argument_id+" AND cast(ARGUMENT_VAL as REAL) "+queryString);
+		      rs = stmt.executeQuery( sql);
+		      System.out.println(sql);
 		      while ( rs.next() ) 
 		      {
-		        arg_value = rs.getInt("ARGUMENT_VAL");
+		    	 arg_value = rs.getInt("ARGUMENT_VAL");
 		               
 		         queryValues.add("\""+argumentString+"\":\""+arg_value+""
 			         		+ "\",");
+	
 			         
 		      }
 		   
-		      if(arg_value==0 || argument_id==0)
+
+		      if(arg_value==999 || argument_id==999)
 		    	  return null;
 		      rs.close();
 		      stmt.close();
@@ -362,8 +374,8 @@ public class SQLiteJDBC
 
 	  Statement stmt = null;
 	  ArrayList<String> argumentValues = new ArrayList<String>();
-	  int argument_id=0;
-	  int arg_value=0;
+	  int argument_id=999;
+	  int arg_value=999;
 	  try 
 	    {
 		      stmt = c.createStatement();
@@ -382,7 +394,7 @@ public class SQLiteJDBC
 		         
 		      }
 		      
-		      if(arg_value==0 || argument_id==0)
+		      if(arg_value==999 || argument_id==999)
 		    	  return null;
 		      rs.close();
 		      stmt.close();
@@ -400,6 +412,7 @@ public class SQLiteJDBC
   {
 	  StringBuffer outputJSON = new StringBuffer("[");
 	  System.out.println("JSONLIST size : "+jsonList.size());
+	  System.out.println("JSONLIST : "+jsonList);
 	  
 	  System.out.println("Generating output JSON....\n");
 	  
@@ -426,6 +439,25 @@ public class SQLiteJDBC
   
   
   public static String generate(List<List<String>> outerList, String outPut, StringBuffer outputJSON) {
+      List<String> list = outerList.get(0);
+
+      for(String str : list) {
+          List<List<String>> newOuter = new ArrayList<List<String>>(outerList);
+          newOuter.remove(list);
+
+          if(outerList.size() > 1) {
+              generate(newOuter, outPut+str,outputJSON);
+           } else {
+        	 outputJSON.append("{"+outPut+str);
+        	 outputJSON.deleteCharAt(outputJSON.length()-1);
+        	 outputJSON.append("},") ;
+
+           }
+      }
+      return outputJSON.toString();
+  }
+  
+  public static String generateImage(List<List<String>> outerList, String outPut, StringBuffer outputJSON) {
       List<String> list = outerList.get(0);
 
       for(String str : list) {
