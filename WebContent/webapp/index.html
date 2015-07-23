@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+  <link data-require="bootstrap-css@3.1.1" data-semver="3.1.1" rel="stylesheet" href="css/bootstrap.min.css" />
+
+  <script data-require="angular.js@1.3.0" data-semver="1.3.0" src="js/angular.js"></script>
+  <script src= "js/angular.min.js"></script>
+  <script data-require="jquery@*" data-semver="2.0.3" src="js/jquery-2.0.3.min.js"></script>
+  <script data-require="bootstrap@3.1.1" data-semver="3.1.1" src="js/bootstrap.min.js"></script>
+  <script data-require="ui-bootstrap@0.4.0" data-semver="0.4.0" src="js/ui-bootstrap-tpls-0.4.0.min.js"></script>
+  <script src="js/angular-animate.js"></script>
+  
+  <script src="js/app.js"></script>
+  <script src="js/dirPagination.js"></script>
+  
+  <link rel="stylesheet"  href="css/pagination.css"/>
+  <link rel="stylesheet"  href="css/groupings.css"/>
+
+</head>
+<body>
+
+<div id="header">
+ 
+
+</div>
+
+
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <div ng-controller="MyController" class="my-controller" ng-init="showData()">
+         <img src="img/cinema_logo_title_black.png" width="500" height="200"></img>
+            <br>
+
+          <div class="row">
+            <div class="col-xs-2">
+              <label for="search">Search:</label>
+             <input id="cinemaSearch" ng-model="cinemaSearch" class="form-control" placeholder="Search" ng-keyup="$event.keyCode == 13 && doSearch()"> 
+
+            </div>
+            <div class="col-xs-2">
+              <label for="search">Items per page:</label>
+              <input type="number" min="1" max="100" class="form-control" ng-model="pageSize">
+            </div>
+            
+         <!--     <div class="col-xs-2">
+      
+		     <select ng-model="selectedItem" ng-options="c as (c.argument) for c in options">
+       		 <option value="">-- Pick A Value --</option>
+		    </select>
+		    <br>Argument: {{selectedItem.argument}}
+
+            </div> -->
+              <div class="col-xs-2">
+                 <br>
+  			<input class="styled-button-8" ng-click="clearSearch()" value="Clear Search" type="submit" />
+            
+            </div>
+          </div>         
+          <br>
+          
+          
+          <div ng-repeat="cluster in clusters" class="Row"  ng-style="groupSearch">
+    <div ng-repeat="smallgroup in cluster.groups" class="Column">
+     <a  target="_blank" ng-click="doSpecificSearch(smallgroup.query)">
+    <div id="large">
+        <img src="{{smallgroup.image1}}" />
+    </div>
+    <div class="small">
+        <img src="{{smallgroup.image2}}" />
+    </div>
+    <div class="small">
+        <img src="{{smallgroup.image3}}" />
+    </div>
+     <div class="desc">{{smallgroup.label}}</div></a></div>
+    
+    
+    <!-- <div class="Column">
+     <a  target="_blank" ng-click="doSpecificSearch('time between 16 AND 30')">
+    <div id="large">
+        <img src="groupImages/group 2/-54.png" />
+    </div>
+    <div class="small">
+        <img src="groupImages/group 2/-90.png" />
+    </div>
+    <div class="small">
+        <img src="groupImages/group 2/36.png" />
+    </div>
+     <div class="desc">Time Steps - 16 to 30</div></a></div>
+    
+    <div class="Column">
+     <a  target="_blank" ng-click="doSpecificSearch('time between 31 AND 45')">
+     <div id="large">
+        <img src="groupImages/group 3/-108.png" />
+    </div>
+    <div class="small">
+        <img src="groupImages/group 3/36.png" />
+    </div>
+    <div class="small">
+        <img src="groupImages/group 3/72.png" />
+    </div>
+     <div class="desc">Time Steps - 31 to 45</div></a></div>
+        
+        
+     <div class="Column"> <a  target="_blank" ng-click="doSpecificSearch('time between 46 AND 60')"><div id="large">
+        <img src="groupImages/group 4/0.png" />
+    </div>
+    <div class="small">
+        <img src="groupImages/group 4/90.png" />
+    </div>
+    <div class="small">
+        <img src="groupImages/group 4/126.png" />
+    </div> <div class="desc">Time Steps - 46 to 60</div></a></div> -->
+        
+    <!--  <div class="Column">
+      <a  target="_blank" ng-click="doSpecificSearch('time between 1 AND 25')">
+      <div id="large">
+        <img src="cinemaimages/group 4/0.png" />
+    </div>
+    <div class="small">
+        <img src="cinemaimages/group 4/162.png" />
+    </div>
+    <div class="small">
+        <img src="cinemaimages/group 4/-126.png" />
+    </div>
+     <div class="desc">Time Steps - 21 to 25</div></a>
+     </div> -->
+    
+</div>
+
+          
+
+			<div style="float:left;">     <img width="20%" height="20%" ng-model="arguments"  onclick="window.open(this.src,'_blank','height=770,width=963')"  popover="{{argument}} Time: {{argument.time}} Phi: {{argument.phi}} Theta: {{argument.theta}}" popover-trigger="mouseenter" popover-append-to-body="true" popover-title="Image Details" ng-style="{ 'margin-top':'30px', 'border':'solid 4px white', 'background-color':'#808080'}" dir-paginate="argument in arguments| filter:q | itemsPerPage: pageSize" src="image 4/{{argument.time}}.000000/{{argument.phi}}/{{argument.theta}}.png"></img>
+			</div>
+			
+		  <div class="text-center" ng-style="paginationTab">
+          <dir-pagination-controls boundary-links="true" on-page-change="pageChangeHandler(newPageNumber)" template-url="dirPagination.tpl.html"></dir-pagination-controls>
+          </div>
+              		         
+ 		 </div>
+      </div>
+    </div>   
+  </div>
+
+
+  
+<div id="footer">Copyright @ datascience.lanl.gov</div>
+</body>
+
+</html>
