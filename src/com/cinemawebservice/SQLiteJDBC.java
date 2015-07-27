@@ -2,10 +2,12 @@
 
 
 import java.sql.*;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -24,10 +26,14 @@ public class SQLiteJDBC
    public static void parseJSON()
   {
     Connection c = null;
-    try {
-      Class.forName("org.sqlite.JDBC");
-      c = DriverManager.getConnection("jdbc:sqlite:cinemafinal60.db");
-      
+    try 
+    {
+	    Class.forName("org.sqlite.JDBC");
+	
+		Properties prop = new Properties();
+	    prop.load(SQLiteJDBC.class.getResourceAsStream("/appProperties.properties"));
+	    c = DriverManager.getConnection(prop.getProperty("dbname"));
+	      
       
     } catch ( Exception e ) {
       System.err.println( e.getClass().getName() + ": " + e.getMessage() );
@@ -119,21 +125,20 @@ public class SQLiteJDBC
 		try 
 		{
 	 
-			input = new FileInputStream("appProperties.properties");
+		//	input = new FileInputStream("appProperties.properties");
 			// load a properties file
-			prop.load(input);
+			prop.load(SQLiteJDBC.class.getResourceAsStream("/appProperties.properties"));
 			// get the property value and print it out
 			String fileName = prop.getProperty("cinemaRootDirectory");
-		/*	String fileName = new String("http://"+"localhost:8080/CinemaWeb/info.json");
-			System.out.println(fileName);
-			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			URL url = classLoader.getResource("http://"+"localhost:8080/CinemaWeb/info.json");*/
+		
 		
 			
 			JSONParser parser = new JSONParser();
 		   try 
 		   {
-		         	Object obj = parser.parse(new FileReader(fileName+"/info.json"));
+		         	
+		
+					Object obj = parser.parse(new BufferedReader(new InputStreamReader(SQLiteJDBC.class.getResourceAsStream("/info.json"))));
 
 					Statement stmt = c.createStatement();
 		            JSONObject jsonObject = (JSONObject) obj; 
@@ -218,7 +223,9 @@ public class SQLiteJDBC
 	  try 
 	  {
 	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:cinemafinal60.db");
+	      Properties prop = new Properties();
+		    prop.load(SQLiteJDBC.class.getResourceAsStream("/appProperties.properties"));
+		    c = DriverManager.getConnection(prop.getProperty("dbname"));
 	     
 	      hierarchy = getHierarchy(c);
 	      
